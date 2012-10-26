@@ -1,4 +1,4 @@
-CC=g++-mp-4.7
+CC=g++
 
 all: readData
 

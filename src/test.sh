@@ -1,1 +1,0 @@
-./readData ../trainFile/ap.fea
