@@ -27,8 +27,10 @@ int main(int argc, char* argv[]){
     cout << "Unable to open the file: " << argv[1] << endl;
     return 1;
   }
-  while(!infile.eof()) {
+  int count=0;
+  for (int i = 0; i< 2250; i++) {
     getline(infile,line,'\n');
+    trans << line;
     while (!trans.eof()) {
       trans >> value;
       veeector.push_back(value);
@@ -37,19 +39,18 @@ int main(int argc, char* argv[]){
     veeector.clear();
     trans.clear();
     line.clear();
+    count++;
   }
-  /*
+#ifdef _DEBUG_
   for (size_t i = 0; i < matrix.size(); i++) {
-    for (size_t j = 0; j < matrix[i].size(); j++) {
-      if (j==matrix.size()-1) {
-        cout << matrix[i][j];
-      }
-      else {
-        cout << matrix[i][j] << ' ';
-      }
+    size_t j;
+    for (j = 0; j < matrix[i].size()-1; j++) {
+      cout << matrix[i][j] << ' ';
     }
-    cout << endl;
-  }*/
+    cout << matrix[i][j++] << endl;
+  }
+#endif
+  infile.close();
 
 
 

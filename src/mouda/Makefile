@@ -1,9 +1,10 @@
 CC=g++
+CPPFLAGS=-g -D_DEBUG_
 
 all: readData
 
 readData:
-	$(CC) -o readData readData.cpp
+	$(CC) $(CPPFLAGS) -o readData readData.cpp
 
 clean:
 	rm -f readData
