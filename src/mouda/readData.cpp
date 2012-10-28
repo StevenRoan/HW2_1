@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <stdio.h>
+#include "inference.h"
 
 using namespace std;
 int main(int argc, char* argv[]){
@@ -71,7 +72,8 @@ int main(int argc, char* argv[]){
     trans.clear();
     line.clear();
   }
-#ifdef _DEBUG_
+#ifdef _DEBUG_ 
+#if (_DEBUG_ < 1)
   for (size_t i = 0; i < matrix.size(); i++) {
     size_t j;
     for (j = 0; j < matrix[i].size()-1; j++) {
@@ -79,6 +81,7 @@ int main(int argc, char* argv[]){
     }
     cout << matrix[i][j++] << endl;
   }
+#endif
 #endif
   dataFile.close();
 
@@ -97,10 +100,12 @@ int main(int argc, char* argv[]){
     token.clear();
   }
 
-#ifdef _DEBUG_
+#ifdef _DEBUG_ 
+#if (_DEBUG_ < 1)
   for (int i = 0; i < word.size(); i++) {
     cout << word[i] << endl;
   }
+#endif
 #endif
 
 // -------------------------------------------------------------------------- //
@@ -121,7 +126,8 @@ int main(int argc, char* argv[]){
     line.clear();
   }
 
-#ifdef _DEBUG_
+#ifdef _DEBUG_ 
+#if (_DEBUG_ < 1)
   for (size_t i = 0; i < WordTopicParms.size(); i++) {
     size_t j;
     for (j = 0; j < WordTopicParms[i].size()-1; j++) {
@@ -129,6 +135,7 @@ int main(int argc, char* argv[]){
     }
     printf("%.10lf\n",WordTopicParms[i][j]);
   }
+#endif
 #endif
 
 // -------------------------------------------------------------------------- //
@@ -149,7 +156,8 @@ int main(int argc, char* argv[]){
     line.clear();
   }
 
-#ifdef _DEBUG_
+#ifdef _DEBUG_ 
+#if (_DEBUG_ < 1)
   for (size_t i = 0; i < TopicDocParms.size(); i++) {
     size_t j;
     for (j = 0; j < TopicDocParms[i].size()-1; j++) {
@@ -158,7 +166,15 @@ int main(int argc, char* argv[]){
     printf("%.15lf\n",TopicDocParms[i][j]);
   }
 #endif
+#endif
 
+
+// ----- inference ----- //
+  
+  int topic=0;
+  int word1=0; 
+  int document=0; 
+  conditionalProb(topic,word1,document);
 
 
 
