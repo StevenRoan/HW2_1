@@ -1,5 +1,6 @@
 CC=g++
-CPPFLAGS=-g -D_DEBUG_
+#CPPFLAGS=-g -D_DEBUG_
+CPPFLAGS=-g
 
 all: readData
 
