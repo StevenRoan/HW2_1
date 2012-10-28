@@ -44,13 +44,13 @@ int main(int argc, char* argv[]){
 
   WordTopicFile.open(argv[3]);
   if (!WordTopicFile.is_open()) {
-    cout << "Unable to open the file: " << argv[2] << endl;
+    cout << "Unable to open the file: " << argv[3] << endl;
     return 1;
   }
   
   TopicDocFile.open(argv[4]);
   if (!TopicDocFile.is_open()) {
-    cout << "Unable to open the file: " << argv[2] << endl;
+    cout << "Unable to open the file: " << argv[4] << endl;
     return 1;
   }
 
