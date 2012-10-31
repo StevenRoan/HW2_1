@@ -9,5 +9,5 @@ using namespace std;
  */
 vector<vector<double> > conditionalProb(
     vector<vector<double> > wordTopicLikelihood , 
-    vector<double> TopicDocLikelihood, 
+    vector<double> DocTopicLikelihood, 
     unsigned int document); 

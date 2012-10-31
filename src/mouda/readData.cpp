@@ -12,7 +12,7 @@ int main(int argc, char* argv[]){
   ifstream dataFile;
   ifstream indexFile; 
   ifstream WordTopicFile;
-  ifstream TopicDocFile;
+  ifstream DocTopicFile;
   string fileName;
   string token;
   string line;
@@ -21,7 +21,7 @@ int main(int argc, char* argv[]){
   vector<unsigned int> veeector;          
   vector<string> word;                    //To store word index 
   vector<vector<double> > WordTopicParms; //To store word topic conditional prob
-  vector<vector<double> > TopicDocParms;  //To store top doc conditional prob
+  vector<vector<double> > DocTopicParms;  //To store top doc conditional prob
   vector<double> rowDouble; 
   int value;
   double logValue;
@@ -49,8 +49,8 @@ int main(int argc, char* argv[]){
     return 1;
   }
   
-  TopicDocFile.open(argv[4]);
-  if (!TopicDocFile.is_open()) {
+  DocTopicFile.open(argv[4]);
+  if (!DocTopicFile.is_open()) {
     cout << "Unable to open the file: " << argv[4] << endl;
     return 1;
   }
@@ -143,47 +143,67 @@ int main(int argc, char* argv[]){
 // @Provides: 
 // -------------------------------------------------------------------------- //
 
-  while (!TopicDocFile.eof()){
-    getline(TopicDocFile,line,'\n');
+  while (!DocTopicFile.eof()){
+    getline(DocTopicFile,line,'\n');
     trans << line;
     while (!trans.eof()) {
       trans >> logValue;
       rowDouble.push_back(logValue);
     }
-    TopicDocParms.push_back(rowDouble);
+    DocTopicParms.push_back(rowDouble);
     rowDouble.clear();
     trans.clear();
     line.clear();
   }
 
 #ifdef _DEBUG_ 
-#if (_DEBUG_ == 1)
-  for (size_t i = 0; i < TopicDocParms.size(); i++) {
+#if (_DEBUG_ < 1)
+  for (size_t i = 0; i < DocTopicParms.size(); i++) {
     size_t j;
-    for (j = 0; j < TopicDocParms[i].size()-1; j++) {
-      printf("%.15lf ",TopicDocParms[i][j]);
+    for (j = 0; j < DocTopicParms[i].size()-1; j++) {
+      printf("%.15lf ",DocTopicParms[i][j]);
     }
-    printf("%.15lf\n",TopicDocParms[i][j]);
+    printf("%.15lf\n",DocTopicParms[i][j]);
   }
 #endif
 #endif
 
 // ----- transport the topic doc parms matrix ----- //
+
+  vector<vector<double> > DocTopicParms_p; 
+  for (size_t i = 0; i < DocTopicParms[0].size(); i++) {
+    size_t j;
+    for (j = 0; j < DocTopicParms.size()-1; j++) {
+      rowDouble.push_back(DocTopicParms[j][i]);
+    }
+    DocTopicParms_p.push_back(rowDouble);
+  }
+
 #ifdef _DEBUG_ 
 #if ( _DEBUG_ == 1) 
   //cout << "_DEBUG_ 2 test: hello word!"<< endl;
-  cout << "_DEBUG_ 2 TopicDocParms size(columns): " 
-    << TopicDocParms[0].size() << endl;
-  cout << "_DEBUG_ 2 TopicDocParms size(rows):    " 
-    << TopicDocParms.size() << endl; 
+  cout << "_DEBUG_ 1 DocTopicParms size(columns): " 
+    << DocTopicParms[0].size() << endl;
+  cout << "_DEBUG_ 1 DocTopicParms size(rows):    " 
+    << DocTopicParms.size() << endl; 
+  //There are some problem in the reading file, ignored
+  cout << "_DEBUG_ 1 The tail of matrix is: " << DocTopicParms[DocTopicParms.size()-1][0] 
+    << endl;
+
+  cout << "_DEBUG_ 1 DocTopicParms_p size(columns): " 
+    << DocTopicParms_p[0].size() << endl;
+  cout << "_DEBUG_ 1 DocTopicParms_p size(rows):    " 
+    << DocTopicParms_p.size() << endl; 
+  //There are some problem in the reading file, ignored
+  cout << "_DEBUG_ 1 The tail of matrix is: " 
+    << DocTopicParms_p[DocTopicParms_p.size()-1][0] << endl;
 #endif
 #endif
 
 // ----- inference ----- //
-// to calculate document for 1 to k
-  
+// to calculate document for 1 to k, I focus on the document 1 first
   int document=0; 
-  conditionalProb(WordTopicParms,TopicDocParms[1],document);
+  conditionalProb(WordTopicParms,DocTopicParms[1],document);
 
 
 // ----- write the inference result to the file ----- //
