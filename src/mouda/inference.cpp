@@ -1,7 +1,10 @@
 #include "inference.h"
-double conditionalProb(int topic, int word, int document){
 
-  std::cout << "hello word!" << std::endl;
+vector<vector<double> > conditionalProb(
+    vector<vector<double> > wordTopicLikelihood , 
+    vector<double> TopicDocLikelihood, 
+    unsigned int document){ 
   //TODO
-  return 0;
+  vector<vector<double> > dummy;
+  return dummy;
 } 

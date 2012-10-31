@@ -157,7 +157,7 @@ int main(int argc, char* argv[]){
   }
 
 #ifdef _DEBUG_ 
-#if (_DEBUG_ < 1)
+#if (_DEBUG_ == 1)
   for (size_t i = 0; i < TopicDocParms.size(); i++) {
     size_t j;
     for (j = 0; j < TopicDocParms[i].size()-1; j++) {
@@ -168,14 +168,25 @@ int main(int argc, char* argv[]){
 #endif
 #endif
 
+// ----- transport the topic doc parms matrix ----- //
+#ifdef _DEBUG_ 
+#if ( _DEBUG_ == 1) 
+  //cout << "_DEBUG_ 2 test: hello word!"<< endl;
+  cout << "_DEBUG_ 2 TopicDocParms size(columns): " 
+    << TopicDocParms[0].size() << endl;
+  cout << "_DEBUG_ 2 TopicDocParms size(rows):    " 
+    << TopicDocParms.size() << endl; 
+#endif
+#endif
 
 // ----- inference ----- //
+// to calculate document for 1 to k
   
-  int topic=0;
-  int word1=0; 
   int document=0; 
-  conditionalProb(topic,word1,document);
+  conditionalProb(WordTopicParms,TopicDocParms[1],document);
 
+
+// ----- write the inference result to the file ----- //
 
 
   return 0;
