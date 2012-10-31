@@ -201,9 +201,9 @@ int main(int argc, char* argv[]){
 #endif
 
 // ----- inference ----- //
-// to calculate document for 1 to k, I focus on the document 1 first
-  int document=0; 
-  conditionalProb(WordTopicParms,DocTopicParms[1],document);
+// to calculate document for 1 to k, I focus on the document 0 first
+  int documentIndex=0; 
+  conditionalProb(WordTopicParms,DocTopicParms_p[0],documentIndex,10,0.9);
 
 
 // ----- write the inference result to the file ----- //
