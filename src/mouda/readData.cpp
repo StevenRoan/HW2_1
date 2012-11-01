@@ -73,7 +73,7 @@ int main(int argc, char* argv[]){
     line.clear();
   }
 #ifdef _DEBUG_ 
-#if (_DEBUG_ < 1)
+#if (_DEBUG_ == 10)
   for (size_t i = 0; i < matrix.size(); i++) {
     size_t j;
     for (j = 0; j < matrix[i].size()-1; j++) {
@@ -101,7 +101,7 @@ int main(int argc, char* argv[]){
   }
 
 #ifdef _DEBUG_ 
-#if (_DEBUG_ < 1)
+#if (_DEBUG_ == 10)
   for (int i = 0; i < word.size(); i++) {
     cout << word[i] << endl;
   }
@@ -128,6 +128,11 @@ int main(int argc, char* argv[]){
 
 #ifdef _DEBUG_ 
 #if (_DEBUG_ < 1)
+  cout << "_DEBUG_ 0 WordTopicParms size(columns): " 
+    << WordTopicParms[0].size() << endl;
+  cout << "_DEBUG_ 0 WordTopicParms size(rows):    " 
+    << WordTopicParms.size() << endl; 
+
   for (size_t i = 0; i < WordTopicParms.size(); i++) {
     size_t j;
     for (j = 0; j < WordTopicParms[i].size()-1; j++) {

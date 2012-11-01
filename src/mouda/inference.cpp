@@ -12,32 +12,12 @@ vector<double> conditionalProb(
     int K,
     double delta){ 
 
+  vector<double> result;
+  vector<double> conditionalZ;
   double epsilon=(1-delta)/(K-1);
-  // ----- construct the matrix A  ----- //
-  vector<vector<double> > A;
-  vector<double> rowA;
   for (int i = 0; i < K; i++) {
-    for (int j = 0; j < K; j++) {
-      if (j==i) rowA.push_back(delta);
-      else rowA.push_back(epsilon);
-    }
-    A.push_back(rowA);
-    rowA.clear();
+//    conditionalZ.push_back(ML*);
   }
-#ifdef _DEBUG_ 
-#if (_DEBUG_ == 2)
-  cout << "_DEBUG_ 2 A size(columns): " << A[0].size() << endl;
-  cout << "_DEBUG_ 2 A size(rows):    " << A.size() << endl; 
-
-  for (size_t i = 0; i < A.size(); i++) {
-    size_t j;
-    for (j = 0; j < A[i].size()-1; j++) {
-      printf("%lf ",A[i][j]);
-    }
-    printf("%lf\n",A[i][j]);
-  }
-#endif
-#endif
 
   //TODO
   vector<double> dummy;
@@ -68,14 +48,16 @@ vector<double> vectorSum(vector<double> a, vector<double> b) {
 
 vector<double> matrixProduct(double delta, double epsilon, vector<double> x) {
   vector<double> result;
-  double allEpsilon = 0.0;
-  for (int i = 0; i < x.size(); i++) {
-    allEpsilon+=epsilon*x[i];
-  }
-  for (int i = 0; i < x.size(); i++) {
-    result.push_back((allEpsilon-(x[i]*epsilon)+(x[i]*delta)));
-  }
   return result; 
+}
+
+// -------------------------------------------------------------------------- //
+// @Description: sumlog
+// @Provides: 
+// -------------------------------------------------------------------------- //
+
+double sumlog( double a, double b){
+  return a + log10(1+exp(a-b));  
 }
 
 // -------------------------------------------------------------------------- //
@@ -83,9 +65,23 @@ vector<double> matrixProduct(double delta, double epsilon, vector<double> x) {
 // @Provides: 
 // -------------------------------------------------------------------------- //
 
-vector<double> MLcompute(vector<double> wordTopic, vector<double> docTopic){
-  vector<double> result;
-  return result;
+vector<double> MLcompute(vector<vector<double> >wordTopic, 
+    vector<double> docTopic, double delta, double epsilon, int K, int t){
+
+  vector<double> ML(K,0);
+  double allEpsilon = 0.0;
+  double temp=0.0;
+
+  for (int j = 0; j < t-1; j++) {
+    for (int i = 0; i < K; i++) {
+      allEpsilon+=sumlog(allEpsilon, epsilon+wordTopic[j][i]+docTopic[i]+ML[i]);
+    }
+    for (int i = 0; i < K; i++) {
+      temp=sumlog(allEpsilon,-1*(epsilon+wordTopic[j][i]+docTopic[i]+ML[i]));
+      ML[i]=sumlog(temp,(delta+wordTopic[j][i]+docTopic[i]+ML[i]));
+    }
+  }
+  return ML;
 }
 
 
@@ -94,7 +90,21 @@ vector<double> MLcompute(vector<double> wordTopic, vector<double> docTopic){
 // @Provides: 
 // -------------------------------------------------------------------------- //
 
-vector<double> MRcompute(vector<double> wordTopic, vector<double> docTopic){
-  vector<double> result;
-  return result;
+vector<double> MRcompute(vector<vector<double> > wordTopic, 
+    vector<double> docTopic, double delta, double epsilon, int K, int t){
+
+  vector<double> MR(K,0);
+  double allEpsilon = 0.0;
+  double temp=0.0;
+
+  for (int j = t+1; j < K; j++) {
+    for (int i = 0; i < K; i++) {
+      allEpsilon+=sumlog(allEpsilon, epsilon+wordTopic[j][i]+docTopic[i]+MR[i]);
+    }
+    for (int i = 0; i < K; i++) {
+      temp=sumlog(allEpsilon,-1*(epsilon+wordTopic[j][i]+docTopic[i]+MR[i]));
+      MR[i]=sumlog(temp,(delta+wordTopic[j][i]+docTopic[i]+MR[i]));
+    }
+  }
+  return MR;
 }

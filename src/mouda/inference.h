@@ -29,5 +29,21 @@ vector<double> vectorSum(vector<double> a, vector<double> b);
  */
 vector<double> matrixProduct(vector<vector<double> > A, vector<double> x);
 
-vector<double> MLcompute(vector<double> wordTopic, vector<double> docTopic);
-vector<double> MRcompute(vector<double> wordTopic, vector<double> docTopic);
+double sumlog(double a, double b);
+
+/* @brief   to compute the ML vector
+ * @param   log of word topic prob. | log of doc topic prob. | delta | epsilon 
+ *          K | current topic t  
+ * @retval  ML vector 
+ */
+vector<double> MLcompute(vector<vector<double> >wordTopic, 
+    vector<double> docTopic, double delta, double epsilon, int K, int t);
+
+/* @brief   to compute the MR vector
+ * @param   log of word topic prob. | log of doc topic prob. | delta | epsilon 
+ *          K | current topic t  
+ * @retval  MR vector 
+ */
+vector<double> MRcompute(vector<double> wordTopic, vector<double> docTopic,
+    double delta, double epsilon, int K, int t);
+
