@@ -5,6 +5,7 @@
 #include <vector>
 #include <stdio.h>
 #include "inference.h"
+#include "writeData.h"
 
 using namespace std;
 int main(int argc, char* argv[]){
@@ -26,8 +27,13 @@ int main(int argc, char* argv[]){
   int value;
   double logValue;
 
-  if (argc != 5) {
-    cout << "Usage: [Data] [Index] [Word topic parms] [Topic doc parms]" << endl; 
+  if (argc != 7) {
+    cout << "Usage: [Data]" << endl; 
+    cout << "       [Index]"<< endl; 
+    cout << "       [Word topic parms]" << endl; 
+    cout << "       [Topic doc parms]"  << endl;
+    cout << "       [Prob output file]" << endl; 
+    cout << "       [Tag output file]" << endl; 
     return 1;
   }
 
@@ -73,7 +79,7 @@ int main(int argc, char* argv[]){
     line.clear();
   }
 #ifdef _DEBUG_ 
-#if (_DEBUG_ == 10)
+#if (_DEBUG_ == 9)
   for (size_t i = 0; i < matrix.size(); i++) {
     size_t j;
     for (j = 0; j < matrix[i].size()-1; j++) {
@@ -173,46 +179,22 @@ int main(int argc, char* argv[]){
 #endif
 #endif
 
-// ----- transport the topic doc parms matrix ----- //
-
-  vector<vector<double> > DocTopicParms_p; 
-  for (size_t i = 0; i < DocTopicParms[0].size(); i++) {
-    size_t j;
-    for (j = 0; j < DocTopicParms.size()-1; j++) {
-      rowDouble.push_back(DocTopicParms[j][i]);
-    }
-    DocTopicParms_p.push_back(rowDouble);
-  }
-
-#ifdef _DEBUG_ 
-#if ( _DEBUG_ == 1) 
-  //cout << "_DEBUG_ 2 test: hello word!"<< endl;
-  cout << "_DEBUG_ 1 DocTopicParms size(columns): " 
-    << DocTopicParms[0].size() << endl;
-  cout << "_DEBUG_ 1 DocTopicParms size(rows):    " 
-    << DocTopicParms.size() << endl; 
-  //There are some problem in the reading file, ignored
-  cout << "_DEBUG_ 1 The tail of matrix is: " << DocTopicParms[DocTopicParms.size()-1][0] 
-    << endl;
-
-  cout << "_DEBUG_ 1 DocTopicParms_p size(columns): " 
-    << DocTopicParms_p[0].size() << endl;
-  cout << "_DEBUG_ 1 DocTopicParms_p size(rows):    " 
-    << DocTopicParms_p.size() << endl; 
-  //There are some problem in the reading file, ignored
-  cout << "_DEBUG_ 1 The tail of matrix is: " 
-    << DocTopicParms_p[DocTopicParms_p.size()-1][0] << endl;
-#endif
-#endif
+  // ----- transport the topic doc parms matrix ----- //
+  vector<vector<double> > DocTopicParms_p;
+  DocTopicParms_p = vectorMatrixTranpose(DocTopicParms);
 
 // ----- inference ----- //
 // to calculate document for 1 to k, I focus on the document 0 first
   int documentIndex=0; 
-  conditionalProb(WordTopicParms,DocTopicParms_p[0],documentIndex,10,0.9);
+  conditionalProb(WordTopicParms,DocTopicParms_p[0],matrix[0],documentIndex,10,0.9);
 
 
 // ----- write the inference result to the file ----- //
 
+  if (!writeProbFile(argv[5],WordTopicParms)) {
+    cerr << "Write data error" << endl;
+    return 1;
+  }
 
   return 0;
 }
