@@ -17,6 +17,7 @@ vector<vector<double> > conditionalProb(
   vector<double> tmpVector;
   vector<double> resultVector;
   vector<vector<double> > tmpMatrix;
+  vector<vector<double> > resultMatrix;
 
   double epsilon=(1-delta)/(K-1);
 
@@ -29,19 +30,41 @@ vector<vector<double> > conditionalProb(
 
   // ----- compute conditional log likelihood ----- //
   tmpVector = vectorElementSum(tmpMatrix[0],DocTopicLikelihood);
+#if (_DEBUG_ == 5)
+  for (int i = 0; i < tmpVector.size(); i++) {
+    cout << tmpVector[i] << ' ' ; 
+  }
+  cout << endl;
+#endif
   tmpVector = 
     vectorElementSum(
         MLcompute(tmpMatrix,DocTopicLikelihood,delta,epsilon,K,t,document.size()),
         tmpVector);
-  resultVector = 
+  tmpVector = 
     vectorElementSum(
         MRcompute(tmpMatrix,DocTopicLikelihood,delta,epsilon,K,t,document.size()), 
         tmpVector);
+#if (_DEBUG_ == 5)
+  for (int i = 0; i < tmpVector.size(); i++) {
+    cout << tmpVector[i] << ' ' ; 
+  }
+  cout << endl;
+#endif
   // end loop
 
   // ----- compute the log likelihood C ----- //
   logC = vectorLogSum(tmpVector);  
+  // ----- comupte the conditinal probability ----- //
+  for (int i = 0; i < tmpVector.size(); i++) {
+    resultVector.push_back(tmpVector[i]/logC);
+  }
 
+#if (_DEBUG_ == 5)
+  for (int i = 0; i < resultVector.size(); i++) {
+    cout << resultVector[i] << ' '; 
+  }
+  cout << endl;
+#endif
 
   //TODO
   return tmpMatrix;
@@ -109,8 +132,11 @@ vector<vector<double> > vectorMatrixTranpose(vector<vector<double> >  a){
  * @retval  vector 
  */
 vector<double> vectorElementSum(vector<double> a, vector<double> b){
- vector<double> dummy;
- return dummy;
+ vector<double> result;
+ for (int i = 0; i < a.size(); i++) {
+   result.push_back(a[i]+b[i]);
+ }
+ return result;
 }
 
 /* @brief   log summation of all the elements in a vector
@@ -118,8 +144,11 @@ vector<double> vectorElementSum(vector<double> a, vector<double> b){
  * @retval  single double value
  */
 double vectorLogSum(vector<double> a){
-  double dummy;
-  return dummy;
+  double result;
+  for (int i = 0; i < a.size(); i++) {
+    result+=sumlog(result, a[i]);
+  }
+  return result;
 }
 
 // -------------------------------------------------------------------------- //
@@ -161,6 +190,9 @@ vector<double> MLcompute(vector<vector<double> >wordTopic,
   double temp=0.0;
 
   for (int j = 0; j < t-1; j++) {
+#if (_DEBUG_ == 5)
+  cout << "here" << endl;
+#endif
     for (int i = 0; i < K; i++) {
       allEpsilon+=sumlog(allEpsilon, epsilon+wordTopic[j][i]+docTopic[i]+ML[i]);
     }
@@ -185,7 +217,7 @@ vector<double> MRcompute(vector<vector<double> > wordTopic,
   double allEpsilon = 0.0;
   double temp=0.0;
 
-  for (int j = t+1; j < T; j++) {
+  for (int j = T-1; j > t+1; j--) {
     for (int i = 0; i < K; i++) {
       allEpsilon+=sumlog(allEpsilon, epsilon+wordTopic[j][i]+docTopic[i]+MR[i]);
     }
