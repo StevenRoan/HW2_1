@@ -1,6 +1,6 @@
 #include<iostream>
 #include<vector>
-#include<math.h>
+#include<cmath>
 #include<stdio.h>
 
 using namespace std;
@@ -29,6 +29,7 @@ vector<double> vectorSum(vector<double> a, vector<double> b);
 
 
 double sumlog(double a, double b);
+double minuslog(double a, double b);
 
 /* @brief   to compute the ML vector
  * @param   log of word topic prob. 
@@ -56,3 +57,8 @@ vector<double> MLcompute(vector<vector<double> > wordTopic, vector<double> docTo
 vector<double> MRcompute(vector<vector<double> > wordTopic, vector<double> docTopic,
     double delta, double epsilon, int K, int t, int T);
 
+/* @brief   to find the most probobal assignment
+ * @param   probability table
+ * @retval  vector of unsigned int
+ */
+vector<unsigned int> mostProbobalAssign(vector<vector<double> > wordTopicProb);

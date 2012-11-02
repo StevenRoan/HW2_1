@@ -54,17 +54,17 @@ int main(int argc, char* argv[]){
     cout << "Unable to open the file: " << argv[3] << endl;
     return 1;
   }
-  
+
   DocTopicFile.open(argv[4]);
   if (!DocTopicFile.is_open()) {
     cout << "Unable to open the file: " << argv[4] << endl;
     return 1;
   }
 
-// -------------------------------------------------------------------------- //
-// @Description: read data file 
-// @Provides: 
-// -------------------------------------------------------------------------- //
+  // -------------------------------------------------------------------------- //
+  // @Description: read data file 
+  // @Provides: 
+  // -------------------------------------------------------------------------- //
 
   for (int i = 0; i< 2250; i++) {
     getline(dataFile,line,'\n');
@@ -91,10 +91,10 @@ int main(int argc, char* argv[]){
 #endif
   dataFile.close();
 
-// -------------------------------------------------------------------------- //
-// @Description: read index file
-// @Provides: 
-// -------------------------------------------------------------------------- //
+  // -------------------------------------------------------------------------- //
+  // @Description: read index file
+  // @Provides: 
+  // -------------------------------------------------------------------------- //
 
   while(!indexFile.eof()){
     getline(indexFile,line,'\n');
@@ -107,17 +107,17 @@ int main(int argc, char* argv[]){
   }
 
 #ifdef _DEBUG_ 
-#if (_DEBUG_ == 10)
+#if (_DEBUG_ == 100)
   for (int i = 0; i < word.size(); i++) {
     cout << word[i] << endl;
   }
 #endif
 #endif
 
-// -------------------------------------------------------------------------- //
-// @Description: To read word topic parameters
-// @Provides: 
-// -------------------------------------------------------------------------- //
+  // -------------------------------------------------------------------------- //
+  // @Description: To read word topic parameters
+  // @Provides: 
+  // -------------------------------------------------------------------------- //
 
   while(!WordTopicFile.eof()){
     getline(WordTopicFile,line,'\n');
@@ -149,10 +149,10 @@ int main(int argc, char* argv[]){
 #endif
 #endif
 
-// -------------------------------------------------------------------------- //
-// @Description: To read topic doc parameters
-// @Provides: 
-// -------------------------------------------------------------------------- //
+  // -------------------------------------------------------------------------- //
+  // @Description: To read topic doc parameters
+  // @Provides: 
+  // -------------------------------------------------------------------------- //
 
   while (!DocTopicFile.eof()){
     getline(DocTopicFile,line,'\n');
@@ -183,18 +183,27 @@ int main(int argc, char* argv[]){
   vector<vector<double> > DocTopicParms_p;
   DocTopicParms_p = vectorMatrixTranpose(DocTopicParms);
 
-// ----- inference ----- //
-// to calculate document for 1 to k, I focus on the document 0 first
-  int documentIndex=0; 
-  conditionalProb(WordTopicParms,DocTopicParms_p[0],matrix[0],documentIndex,10,0.9);
+  // ----- inference ----- //
+  // to calculate document for 1 to k, I focus on the document 0 first
+  int documentIndex=1; 
+  vector<vector<double> > Doc;
+  vector<unsigned int> singlTopicIndex;
+  vector<vector<unsigned int> > topicIndex;
+  
+  for (int i = 0; i < 10; i++) {
+    Doc = conditionalProb(WordTopicParms,DocTopicParms_p[i],matrix[i],documentIndex,10,0.9);
+    singlTopicIndex = mostProbobalAssign(Doc);
+    topicIndex.push_back(singlTopicIndex);
+  }
+  // ----- write the inference result to the file ----- //
 
-
-// ----- write the inference result to the file ----- //
+  if (!writeTagFile(argv[6],matrix,topicIndex)) {
+    return 1;
+  }
 
   if (!writeProbFile(argv[5],WordTopicParms)) {
     cerr << "Write data error" << endl;
     return 1;
   }
-
   return 0;
 }

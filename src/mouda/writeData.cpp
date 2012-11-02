@@ -61,17 +61,17 @@ bool writeProbFile(char* fileName, vector<vector<double> > probTable){
 
 //TODO
 bool writeTagFile(char* fileName, vector<vector<unsigned int> > dataMatrix,
-    vector<unsigned int>  wordIndex, vector<vector<double> > probTable) {
+    vector<vector<unsigned int> > assignment) {
 
   ofstream outFile;
   outFile.open(fileName);
 
-  for (size_t i = 0; i < dataMatrix.size(); i++) {
+  for (size_t i = 0; i < assignment.size(); i++) {
     size_t j;
-    for (j = 0; j < dataMatrix[i].size()-1; j++) {
-      outFile << dataMatrix[i][j] <<'/'<< ' ';
+    for (j = 0; j < dataMatrix[i].size(); j++) {
+      outFile << dataMatrix[i][j] <<'/' << assignment[i][j]+1 << ' ' ;
     }
-    outFile << dataMatrix[i][j++] << endl;
+    outFile<<endl;
   }
 
   outFile.close();

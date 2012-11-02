@@ -21,53 +21,44 @@ vector<vector<double> > conditionalProb(
 
   double epsilon=(1-delta)/(K-1);
 
-  // for t == 1
-  unsigned int t=1;
-  // ----- determine the word topic ----- //
-  tmpMatrix = getWordProb(wordTopicLikelihood,document,K);
-  tmpMatrix = vectorMatrixTranpose(tmpMatrix);
+  for (unsigned int t = 0; t < document.size(); t++) {
+    //unsigned int t=1;
+    // ----- determine the word topic ----- //
+    tmpMatrix = getWordProb(wordTopicLikelihood,document,K);
+    tmpMatrix = vectorMatrixTranpose(tmpMatrix);
 
-
-  // ----- compute conditional log likelihood ----- //
-  tmpVector = vectorElementSum(tmpMatrix[0],DocTopicLikelihood);
-#if (_DEBUG_ == 5)
-  for (int i = 0; i < tmpVector.size(); i++) {
-    cout << tmpVector[i] << ' ' ; 
-  }
-  cout << endl;
+    // ----- compute conditional log likelihood ----- //
+    tmpVector = vectorElementSum(tmpMatrix[t],DocTopicLikelihood);
+    tmpVector = 
+      vectorElementSum(
+          MLcompute(tmpMatrix,DocTopicLikelihood,delta,epsilon,K,t+1,document.size()),
+          tmpVector);
+    tmpVector = 
+      vectorElementSum(
+          MRcompute(tmpMatrix,DocTopicLikelihood,delta,epsilon,K,t+1,document.size()), 
+          tmpVector);
+#if (_DEBUG_ == 6)
+    cout << "resultVector: " << endl;
+    for (int i = 0; i < tmpVector.size(); i++) {
+      cout << tmpVector[i] << ' '; 
+      //cout << exp(resultVector[i]) ;
+    }
+    cout << endl;
 #endif
-  tmpVector = 
-    vectorElementSum(
-        MLcompute(tmpMatrix,DocTopicLikelihood,delta,epsilon,K,t,document.size()),
-        tmpVector);
-  tmpVector = 
-    vectorElementSum(
-        MRcompute(tmpMatrix,DocTopicLikelihood,delta,epsilon,K,t,document.size()), 
-        tmpVector);
-#if (_DEBUG_ == 5)
-  for (int i = 0; i < tmpVector.size(); i++) {
-    cout << tmpVector[i] << ' ' ; 
-  }
-  cout << endl;
+    // ----- compute the log likelihood C ----- //
+    logC = vectorLogSum(tmpVector);  
+#if (_DEBUG_ == 6)
+    cout << "logC: " << logC << endl;
 #endif
+    // ----- comupte the conditinal probability ----- //
+    for (int i = 0; i < tmpVector.size(); i++) {
+      resultVector.push_back(tmpVector[i]-logC);
+    }
+    resultMatrix.push_back(resultVector);
+    resultVector.clear();
+  }
   // end loop
-
-  // ----- compute the log likelihood C ----- //
-  logC = vectorLogSum(tmpVector);  
-  // ----- comupte the conditinal probability ----- //
-  for (int i = 0; i < tmpVector.size(); i++) {
-    resultVector.push_back(tmpVector[i]/logC);
-  }
-
-#if (_DEBUG_ == 5)
-  for (int i = 0; i < resultVector.size(); i++) {
-    cout << resultVector[i] << ' '; 
-  }
-  cout << endl;
-#endif
-
-  //TODO
-  return tmpMatrix;
+  return resultMatrix;
 } 
 
 /* @brief   get the correspond word top log prob.
@@ -116,8 +107,9 @@ vector<vector<double> > vectorMatrixTranpose(vector<vector<double> >  a){
       rowDouble.push_back(a[j][i]);
     }
     result.push_back(rowDouble);
+    rowDouble.clear();
   }
-#if ( _DEBUG_ == 4)
+#if ( _DEBUG_ == 20)
   cout << "_DEBUG_ 4 a size(columns):      " << a[0].size()     << endl;
   cout << "_DEBUG_ 4 a size(rows):         " << a.size()        << endl; 
   cout << "_DEBUG_ 4 result size(columns): " << result[0].size()<< endl;
@@ -132,11 +124,11 @@ vector<vector<double> > vectorMatrixTranpose(vector<vector<double> >  a){
  * @retval  vector 
  */
 vector<double> vectorElementSum(vector<double> a, vector<double> b){
- vector<double> result;
- for (int i = 0; i < a.size(); i++) {
-   result.push_back(a[i]+b[i]);
- }
- return result;
+  vector<double> result;
+  for (int i = 0; i < a.size(); i++) {
+    result.push_back(a[i]+b[i]);
+  }
+  return result;
 }
 
 /* @brief   log summation of all the elements in a vector
@@ -144,9 +136,9 @@ vector<double> vectorElementSum(vector<double> a, vector<double> b){
  * @retval  single double value
  */
 double vectorLogSum(vector<double> a){
-  double result;
-  for (int i = 0; i < a.size(); i++) {
-    result+=sumlog(result, a[i]);
+  double result=a[0];
+  for (int i = 1; i < a.size(); i++) {
+    result=sumlog(result, a[i]);
   }
   return result;
 }
@@ -174,7 +166,16 @@ vector<double> vectorSum(vector<double> a, vector<double> b) {
 // -------------------------------------------------------------------------- //
 
 double sumlog( double a, double b){
-  return a + log10(1+exp(a-b));  
+  if ( a-b > 6) return a;
+  if ( b-a > 6) return b;
+  return a + log(1+exp(b-a));  
+}
+
+double minuslog( double a, double b){
+  if ( a-b > 6) return a;
+  if ( b-a > 6) return b;
+  return a + log(1-exp(b-a));
+
 }
 
 // -------------------------------------------------------------------------- //
@@ -188,19 +189,25 @@ vector<double> MLcompute(vector<vector<double> >wordTopic,
   vector<double> ML(K,0);
   double allEpsilon = 0.0;
   double temp=0.0;
+  double logEpsilon=log(epsilon);
+  double logDelta=log(delta); 
 
-  for (int j = 0; j < t-1; j++) {
-#if (_DEBUG_ == 5)
-  cout << "here" << endl;
-#endif
-    for (int i = 0; i < K; i++) {
-      allEpsilon+=sumlog(allEpsilon, epsilon+wordTopic[j][i]+docTopic[i]+ML[i]);
+  for (int j = 1; j <= t-1; j++) {
+    allEpsilon = logEpsilon+wordTopic[j-1][0]+docTopic[0]+ML[0];
+    for (int i = 1; i < K; i++) {
+      allEpsilon=sumlog(allEpsilon, logEpsilon+wordTopic[j-1][i]+docTopic[i]+ML[i]);
     }
     for (int i = 0; i < K; i++) {
-      temp=sumlog(allEpsilon,-1*(epsilon+wordTopic[j][i]+docTopic[i]+ML[i]));
-      ML[i]=sumlog(temp,(delta+wordTopic[j][i]+docTopic[i]+ML[i]));
-    }
+      temp=minuslog(allEpsilon,(logEpsilon+wordTopic[j-1][i]+docTopic[i]+ML[i]));
+      ML[i]=sumlog(temp,(logDelta+wordTopic[j-1][i]+docTopic[i]+ML[i]));
+   }
   }
+#if (_DEBUG_ == 4)
+  for (int i = 0; i < ML.size(); i++) {
+      cout << ML[i] << ' ';
+  }
+  cout << endl;
+#endif
   return ML;
 }
 
@@ -216,15 +223,56 @@ vector<double> MRcompute(vector<vector<double> > wordTopic,
   vector<double> MR(K,0);
   double allEpsilon = 0.0;
   double temp=0.0;
+  double logEpsilon=log(epsilon);
+  double logDelta=log(delta); 
 
-  for (int j = T-1; j > t+1; j--) {
-    for (int i = 0; i < K; i++) {
-      allEpsilon+=sumlog(allEpsilon, epsilon+wordTopic[j][i]+docTopic[i]+MR[i]);
+  for (int j = T-2; j >= t-1; j--) {
+    allEpsilon=logEpsilon+wordTopic[j+1][0]+docTopic[0]+MR[0];
+    for (int i = 1; i < K; i++) {
+      allEpsilon=sumlog(allEpsilon, logEpsilon+wordTopic[j+1][i]+docTopic[i]+MR[i]);
     }
+
     for (int i = 0; i < K; i++) {
-      temp=sumlog(allEpsilon,-1*(epsilon+wordTopic[j][i]+docTopic[i]+MR[i]));
-      MR[i]=sumlog(temp,(delta+wordTopic[j][i]+docTopic[i]+MR[i]));
+      temp=minuslog(allEpsilon,(logEpsilon+wordTopic[j+1][i]+docTopic[i]+MR[i]));
+      MR[i]=sumlog(temp,(logDelta+wordTopic[j+1][i]+docTopic[i]+MR[i]));
     }
   }
+#if (_DEBUG_ == 5)
+  for (int i = 0; i < MR.size(); i++) {
+      cout << MR[i] << ' ';
+  }
+  cout << endl;
+#endif
   return MR;
+}
+
+// -------------------------------------------------------------------------- //
+// @Description: mostProbobalAssign
+// @Provides: 
+// -------------------------------------------------------------------------- //
+
+vector<unsigned int> mostProbobalAssign(vector<vector<double> > wordTopicProb ){
+  double maxValue=-65536.0;
+  unsigned int maxIndex= 65536;
+  vector<unsigned int> result;
+#if (_DEBUG_ ==7)
+  for (int i = 0; i < wordTopicProb.size(); i++) {
+    for (int j = 0; j < wordTopicProb[i].size(); j++) {
+      cout << wordTopicProb[i][j] << ' ' ;
+    }
+    cout << endl;
+  }
+#endif
+  for (int i = 0; i < wordTopicProb.size(); i++) {
+    for (int j = 0; j < wordTopicProb[i].size(); j++) {
+      if ( wordTopicProb[i][j] > maxValue) {
+        maxValue = wordTopicProb[i][j];
+        maxIndex = j;
+      }
+    }
+    result.push_back(maxIndex);
+    maxValue=-65536.0;
+    maxIndex = 65536;
+  }
+  return result; 
 }
