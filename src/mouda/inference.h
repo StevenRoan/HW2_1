@@ -11,7 +11,8 @@ vector<vector<double> > conditionalProb(
     vector<unsigned int> document,
     unsigned int docIndex,
     unsigned int K,
-    double delta); 
+    double delta,
+    double &logC); 
 
 vector<vector<double> > getWordProb(vector<vector<double> > WTL, 
     vector<unsigned int> doc, unsigned int K);

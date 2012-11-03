@@ -2,36 +2,20 @@
 
 /* @brief   write probability table to the file 
  * @param   file name
- *          probability table
- *                  Word1 Word2 Word3 Word4 Word5 ....
- *          Topic1  0.xx  0.xx  0.xx  0.xx  0.xx
- *          Topic2  0.xx  0.xx  0.xx  0.xx  0.xx
- *          Topic3  0.xx  0.xx  0.xx  0.xx  0.xx
- *          Topic4  0.xx  0.xx  0.xx  0.xx  0.xx
+ *          sum of ln(w1,w2,...,wT,d) 
  *          ...
  * @retval  boolean value to determine if the table is write out correctly
  *
  * @output format
+ *          single value:
+ *          xxxx.xxxx
  *
- *          0.xx  0.xx  0.xx  0.xx  0.xx
- *          0.xx  0.xx  0.xx  0.xx  0.xx
- *          0.xx  0.xx  0.xx  0.xx  0.xx
- *          0.xx  0.xx  0.xx  0.xx  0.xx
  */
 
-bool writeProbFile(char* fileName, vector<vector<double> > probTable){
+bool writeProbFile(char* fileName, double sumProb){
   ofstream outFile;
   outFile.open(fileName);
-
-
-  for (size_t i = 0; i < probTable.size(); i++) {
-    size_t j;
-    for (j = 0; j < probTable[i].size()-1; j++) {
-      outFile << probTable[i][j] << ' ' ;
-    }
-    outFile << probTable[i][j] << endl;
-  }
-
+  outFile << sumProb;
   outFile.close();
   return true;
 }

@@ -20,85 +20,85 @@ vector<vector<double> > conditionalProb(
   //wordTopicParms_Trans=vectorMatrixTranpose(wordTopicParms);
   //DocTopicParms_Trans= vectorMatrixTranpose(DocTopicParms);
 
-      int lenDoc=documentData.size();
-      vector <vector<double> > maML;
-      for(int j=0;j<lenDoc;j++)//for all the words in the document, compute ML
-      {
-      maML.push_back(computeML(wordTopicParms, DocTopicParms, maML, documentData, delta, epsilon,
-      K, j, docIndex));
-      }
-
-      vector <vector<double> > maMR;
-      for(int j=lenDoc-1;j>=0;j--)//for all the words in the document, compute ML
-      {
-      maMR.push_back(computeMR(wordTopicParms, DocTopicParms, maMR, documentData, delta, epsilon,
-      K, j, docIndex,lenDoc));
-      }
-
-
-/*
-  for(int i=0;i<1;i++)//For all document
-
+  int lenDoc=documentData.size();
+  vector <vector<double> > maML;
+  for(int j=0;j<lenDoc;j++)//for all the words in the document, compute ML
   {
-    vector<vector <double> > maML;
-    int lenDoc=documentData[i].size();
+    maML.push_back(computeML(wordTopicParms, DocTopicParms, maML, documentData, delta, epsilon,
+          K, j, docIndex));
+  }
 
-    for(int j=0;j<lenDoc;j++)//for all the words in the document, compute ML
-    {
-      maML.push_back(computeML(wordTopicParms, DocTopicParms, maML, documentData[i], delta, epsilon,K, j, i));
-    }
-    vector<vector <double> > maMR;
-    for(int j=lenDoc-1;j>=0;j--)//for all the words in the document, compute ML
-    {
-      maMR.push_back(computeMR(wordTopicParms, DocTopicParms, maMR, documentData[i], delta, epsilon,K, j, i,lenDoc));
-    }
-    for(int z1=0;z1<maMR.size();z1++)
-    {
-      for(int z2=0;z2<maMR[z1].size();z2++)
-      {
-        cout<<maML[z1][z2]<<" ";
-      }
-      cout<<endl;
-    }
-  }*/
+  vector <vector<double> > maMR;
+  for(int j=lenDoc-1;j>=0;j--)//for all the words in the document, compute ML
+  {
+    maMR.push_back(computeMR(wordTopicParms, DocTopicParms, maMR, documentData, delta, epsilon,
+          K, j, docIndex,lenDoc));
+  }
+
+
+  /*
+     for(int i=0;i<1;i++)//For all document
+
+     {
+     vector<vector <double> > maML;
+     int lenDoc=documentData[i].size();
+
+     for(int j=0;j<lenDoc;j++)//for all the words in the document, compute ML
+     {
+     maML.push_back(computeML(wordTopicParms, DocTopicParms, maML, documentData[i], delta, epsilon,K, j, i));
+     }
+     vector<vector <double> > maMR;
+     for(int j=lenDoc-1;j>=0;j--)//for all the words in the document, compute ML
+     {
+     maMR.push_back(computeMR(wordTopicParms, DocTopicParms, maMR, documentData[i], delta, epsilon,K, j, i,lenDoc));
+     }
+     for(int z1=0;z1<maMR.size();z1++)
+     {
+     for(int z2=0;z2<maMR[z1].size();z2++)
+     {
+     cout<<maML[z1][z2]<<" ";
+     }
+     cout<<endl;
+     }
+     }*/
 
 #if (_DEBUG_ == 11)
-//  cout << "_DEBUG_ 11 num of rows   " << wordTopicParms.size()<< endl;
-//  cout << "_DEBUG_ 11 num of columns" << wordTopicParms[0].size()<< endl;
+  //  cout << "_DEBUG_ 11 num of rows   " << wordTopicParms.size()<< endl;
+  //  cout << "_DEBUG_ 11 num of columns" << wordTopicParms[0].size()<< endl;
 
-for(int z1=0;z1<maML.size();z1++)
-{
-  for(int z2=0;z2<maML[z1].size();z2++)
+  for(int z1=0;z1<maML.size();z1++)
   {
-    cout<<maML[z1][z2]<<" ";
+    for(int z2=0;z2<maML[z1].size();z2++)
+    {
+      cout<<maML[z1][z2]<<" ";
+    }
+    cout<<endl;
   }
-  cout<<endl;
-}
 #endif
 
-vector <double> tmpVector;
-vector <double> resultVector;
-vector <vector<double> > resultProb;
-vector <vector<double> > wordParmsForDoc;
-double logC=0;
-// ----- determine the word topic ----- //
-wordParmsForDoc = getWordProb(wordTopicParms,documentData,K);
-wordParmsForDoc = vectorMatrixTranpose(wordParmsForDoc);
-for (int i = 0; i < lenDoc; i++) {
-  tmpVector = vectorElementSum(wordParmsForDoc[i],DocTopicParms[docIndex]);
-  tmpVector = vectorElementSum(maML[i],tmpVector);
-  tmpVector = vectorElementSum(maMR[lenDoc-1-i], tmpVector);
-  logC = vectorLogSum(tmpVector);  
+  vector <double> tmpVector;
+  vector <double> resultVector;
+  vector <vector<double> > resultProb;
+  vector <vector<double> > wordParmsForDoc;
+  double logC=0;
+  // ----- determine the word topic ----- //
+  wordParmsForDoc = getWordProb(wordTopicParms,documentData,K);
+  wordParmsForDoc = vectorMatrixTranpose(wordParmsForDoc);
+  for (int i = 0; i < lenDoc; i++) {
+    tmpVector = vectorElementSum(wordParmsForDoc[i],DocTopicParms[docIndex]);
+    tmpVector = vectorElementSum(maML[i],tmpVector);
+    tmpVector = vectorElementSum(maMR[lenDoc-1-i], tmpVector);
+    logC = vectorLogSum(tmpVector);  
 
-  for (int i = 0; i < tmpVector.size(); i++) {
-    resultVector.push_back(tmpVector[i]-logC);
+    for (int i = 0; i < tmpVector.size(); i++) {
+      resultVector.push_back(tmpVector[i]-logC);
+    }
+    resultProb.push_back(resultVector);
+    tmpVector.clear();
+    resultVector.clear();
   }
-  resultProb.push_back(resultVector);
-  tmpVector.clear();
-  resultVector.clear();
-}
 
-return resultProb;
+  return resultProb;
 }
 
 

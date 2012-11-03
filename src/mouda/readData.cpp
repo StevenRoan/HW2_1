@@ -84,10 +84,10 @@ int main(int argc, char* argv[]){
 #if (_DEBUG_ == 9)
   for (size_t i = 0; i < matrix.size(); i++) {
     size_t j;
-    for (j = 0; j < matrix[i].size()-1; j++) {
+    for (j = 0; j < matrix[i].size(); j++) {
       cout << matrix[i][j] << ' ';
     }
-    cout << matrix[i][j++] << endl;
+    cout << endl;
   }
 #endif
 #endif
@@ -194,20 +194,26 @@ int main(int argc, char* argv[]){
   
   string topicNumber = argv[7];
   int topicNum = 0;
+  double logC = 0;
+  double sumLogC = 0;
   trans << topicNumber;
   trans >> topicNum ; 
-  for (int i = 0; i < 10; i++) {
-    Doc = conditionalProb(WordTopicParms,DocTopicParms_p[i],matrix[i],documentIndex,topicNum,0.9);
+  for (int i = 0; i < 2250; i++) {
+    Doc = conditionalProb(WordTopicParms,DocTopicParms_p[i],matrix[i],documentIndex,
+        topicNum,0.9, logC);
     singlTopicIndex = mostProbobalAssign(Doc);
     topicIndex.push_back(singlTopicIndex);
+    sumLogC += logC;
+    logC = 0;
   }
   // ----- write the inference result to the file ----- //
 
   if (!writeTagFile(argv[6],matrix,topicIndex)) {
+    cerr << "Write data error" << endl;
     return 1;
   }
 
-  if (!writeProbFile(argv[5],WordTopicParms)) {
+  if (!writeProbFile(argv[5],sumLogC)) {
     cerr << "Write data error" << endl;
     return 1;
   }

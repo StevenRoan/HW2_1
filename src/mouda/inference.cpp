@@ -11,9 +11,8 @@ vector<vector<double> > conditionalProb(
     vector<unsigned int> document,
     unsigned int docIndex,
     unsigned int K,
-    double delta){ 
-
-  double logC=0;
+    double delta,
+    double &logC){ 
   vector<double> tmpVector;
   vector<double> resultVector;
   vector<vector<double> > tmpMatrix;
@@ -37,15 +36,13 @@ vector<vector<double> > conditionalProb(
       vectorElementSum(
           MRcompute(tmpMatrix,DocTopicLikelihood,delta,epsilon,K,t+1,document.size()), 
           tmpVector);
-#if (_DEBUG_ == 6)
-    cout << "resultVector: " << endl;
+    // ----- compute the log likelihood C ----- //
+#if (_DEBUG_ == 17)
     for (int i = 0; i < tmpVector.size(); i++) {
-      cout << tmpVector[i] << ' '; 
-      //cout << exp(resultVector[i]) ;
+      cout << tmpVector[i] << ' ' ;
     }
     cout << endl;
 #endif
-    // ----- compute the log likelihood C ----- //
     logC = vectorLogSum(tmpVector);  
 #if (_DEBUG_ == 6)
     cout << "logC: " << logC << endl;
@@ -57,7 +54,6 @@ vector<vector<double> > conditionalProb(
     resultMatrix.push_back(resultVector);
     resultVector.clear();
   }
-  // end loop
   return resultMatrix;
 } 
 
