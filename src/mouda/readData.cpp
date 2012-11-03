@@ -27,13 +27,14 @@ int main(int argc, char* argv[]){
   int value;
   double logValue;
 
-  if (argc != 7) {
+  if (argc != 8) {
     cout << "Usage: [Data]" << endl; 
     cout << "       [Index]"<< endl; 
     cout << "       [Word topic parms]" << endl; 
     cout << "       [Topic doc parms]"  << endl;
     cout << "       [Prob output file]" << endl; 
     cout << "       [Tag output file]" << endl; 
+    cout << "       [Topic number   ]" << endl;
     return 1;
   }
 
@@ -69,6 +70,7 @@ int main(int argc, char* argv[]){
   for (int i = 0; i< 2250; i++) {
     getline(dataFile,line,'\n');
     trans << line;
+    trans >> value; //first is not word
     while (!trans.eof()) {
       trans >> value;
       veeector.push_back(value);
@@ -190,8 +192,12 @@ int main(int argc, char* argv[]){
   vector<unsigned int> singlTopicIndex;
   vector<vector<unsigned int> > topicIndex;
   
+  string topicNumber = argv[7];
+  int topicNum = 0;
+  trans << topicNumber;
+  trans >> topicNum ; 
   for (int i = 0; i < 10; i++) {
-    Doc = conditionalProb(WordTopicParms,DocTopicParms_p[i],matrix[i],documentIndex,10,0.9);
+    Doc = conditionalProb(WordTopicParms,DocTopicParms_p[i],matrix[i],documentIndex,topicNum,0.9);
     singlTopicIndex = mostProbobalAssign(Doc);
     topicIndex.push_back(singlTopicIndex);
   }

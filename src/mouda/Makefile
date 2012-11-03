@@ -1,5 +1,5 @@
 CC=g++
-CPPFLAGS=-g -D_DEBUG_=7
+CPPFLAGS=-g -D_DEBUG_=30
 #CPPFLAGS=
 
 all: readData.o inference.o writeData.o hw2_1
